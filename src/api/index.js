@@ -40,11 +40,7 @@ export const createMeeting = async ({token}) => {
 	}
 };
 
-interface IValidateMeeting {
-	roomId: string;
-	token: string;
-}
-export const validateMeeting = async ({roomId, token}: IValidateMeeting) => {
+export const validateMeeting = async ({roomId, token}) => {
 	const url = `${API_BASE_URL}/v2/rooms/validate/${roomId}`;
 
 	const options = {
