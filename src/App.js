@@ -31,9 +31,7 @@ function App() {
 
   return (
     <>
-      <MeetingAppProvider>
         {isMeetingStarted ? (
-
           <MeetingProvider
             config={{
               meetingId,
@@ -85,7 +83,6 @@ function App() {
             setIsMeetingLeft={setIsMeetingLeft}
           />
         )}
-      </MeetingAppProvider>
     </>
   );
 }

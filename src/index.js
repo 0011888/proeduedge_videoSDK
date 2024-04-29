@@ -1,13 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import App from "./App";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {RouteProvider} from "./routes/root";
+import {MeetingAppProvider} from "./MeetingAppContextDef";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <>
+  <MeetingAppProvider>
     <ToastContainer
       toastClassName={() =>
         "relative flex py-4 px-3 rounded overflow-hidden cursor-pointer bg-white shadow-lg"
@@ -25,6 +26,6 @@ root.render(
       pauseOnHover
       theme="light"
     />
-    <App />
-  </>
+    <RouteProvider/>
+  </MeetingAppProvider>
 );

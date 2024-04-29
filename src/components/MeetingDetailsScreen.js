@@ -1,6 +1,7 @@
 import { CheckIcon, ClipboardIcon } from "@heroicons/react/outline";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { useMeetingAppContext } from "../MeetingAppContextDef";
 
 export function MeetingDetailsScreen({
   onClickJoin,
@@ -9,12 +10,19 @@ export function MeetingDetailsScreen({
   setParticipantName,
   onClickStartMeeting,
 }) {
+  const { userInfo } = useMeetingAppContext();
   const [meetingId, setMeetingId] = useState("");
   const [meetingIdError, setMeetingIdError] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [iscreateMeetingClicked, setIscreateMeetingClicked] = useState(false);
   const [isJoinMeetingClicked, setIsJoinMeetingClicked] = useState(false);
 
+  useEffect(() => {
+    if (userInfo?.roomId) {
+      setMeetingId(userInfo.roomId);
+      setIsJoinMeetingClicked(true);
+    }
+  }, [userInfo]);
   return (
     <div
       className={`flex flex-1 flex-col justify-center w-full md:p-[6px] sm:p-1 p-1.5`}
@@ -44,10 +52,8 @@ export function MeetingDetailsScreen({
       ) : isJoinMeetingClicked ? (
         <>
           <input
-            defaultValue={meetingId}
-            onChange={(e) => {
-              setMeetingId(e.target.value);
-            }}
+            readOnly
+            defaultValue={userInfo?.roomId}
             placeholder={"Enter meeting Id"}
             className="px-4 py-3 bg-gray-650 rounded-xl text-white w-full text-center"
           />
@@ -67,8 +73,9 @@ export function MeetingDetailsScreen({
           />
           <button
             disabled={participantName.length < 3}
-            className={`w-full ${participantName.length < 3 ? "bg-gray-650" : "bg-purple-350"
-              }  text-white px-2 py-3 rounded-xl mt-5`}
+            className={`w-full ${
+              participantName.length < 3 ? "bg-gray-650" : "bg-purple-350"
+            }  text-white px-2 py-3 rounded-xl mt-5`}
             onClick={(e) => {
               if (iscreateMeetingClicked) {
                 onClickStartMeeting();
@@ -87,18 +94,17 @@ export function MeetingDetailsScreen({
       {!iscreateMeetingClicked && !isJoinMeetingClicked && (
         <div className="w-full md:mt-0 mt-4 flex flex-col">
           <div className="flex items-center justify-center flex-col w-full ">
-            <button
-              className="w-full bg-purple-350 text-white px-2 py-3 rounded-xl"
-              onClick={async (e) => {
-                const { meetingId, err } = await _handleOnCreateMeeting();
-              
-                if (meetingId) {
-                  setMeetingId(meetingId);
-                  setIscreateMeetingClicked(true);
-                } else {
-                  toast(
-                    `${err}`,
-                    {
+            {userInfo.role === "instructor" && (
+              <button
+                className="w-full bg-purple-350 text-white px-2 py-3 rounded-xl"
+                onClick={async (e) => {
+                  const { meetingId, err } = await _handleOnCreateMeeting();
+
+                  if (meetingId) {
+                    setMeetingId(meetingId);
+                    setIscreateMeetingClicked(true);
+                  } else {
+                    toast(`${err}`, {
                       position: "bottom-left",
                       autoClose: 4000,
                       hideProgressBar: true,
@@ -107,21 +113,23 @@ export function MeetingDetailsScreen({
                       draggable: true,
                       progress: undefined,
                       theme: "light",
-                    }
-                  );
-                }
-              }}
-            >
-              Create a meeting
-            </button>
-            <button
-              className="w-full bg-gray-650 text-white px-2 py-3 rounded-xl mt-5"
-              onClick={(e) => {
-                setIsJoinMeetingClicked(true);
-              }}
-            >
-              Join a meeting
-            </button>
+                    });
+                  }
+                }}
+              >
+                Create a meeting
+              </button>
+            )}
+            {userInfo.role === "student" && (
+              <button
+                className="w-full bg-gray-650 text-white px-2 py-3 rounded-xl mt-5"
+                onClick={(e) => {
+                  setIsJoinMeetingClicked(true);
+                }}
+              >
+                Join a meeting
+              </button>
+            )}
           </div>
         </div>
       )}
